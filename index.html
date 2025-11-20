@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magyar Geometry Dash Leaderboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --bg-card: #151515;
+            --bg-hover: #202020;
+            --text-muted: #666666;
+            --gold: #fec12a;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+            
+            --color-stars: #fec12a;
+            --color-moons: #4d9be6;
+            --color-diamonds: #00ffff;
+            --color-coins: #c0c0c0;
+            --color-demons: #ff4040;
+            --color-creator: #cd853f;
+        }
+
+        body {
+            background: linear-gradient(135deg, #000000 0%, #111111 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #bg-animation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .falling-item {
+            position: absolute;
+            top: -10%;
+            opacity: 0.2;
+            animation: fall linear forwards;
+        }
+
+        .falling-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.15; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .main-header {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--gold);
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(254, 193, 42, 0.3);
+            animation: fadeIn 1s ease-in;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-menu {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .nav-menu .nav-item {
+            flex: 1;
+            margin: 5px;
+            min-width: 140px;
+        }
+
+        .nav-link {
+            background: var(--bg-card);
+            color: #ddd;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 15px 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link[data-category="stars"] { --theme-color: var(--color-stars); --text-on-active: black; }
+        .nav-link[data-category="moons"] { --theme-color: var(--color-moons); --text-on-active: white; }
+        .nav-link[data-category="diamonds"] { --theme-color: var(--color-diamonds); --text-on-active: black; }
+        .nav-link[data-category="usercoins"] { --theme-color: var(--color-coins); --text-on-active: black; }
+        .nav-link[data-category="demons"] { --theme-color: var(--color-demons); --text-on-active: white; }
+        .nav-link[data-category="creator"] { --theme-color: var(--color-creator); --text-on-active: white; }
+
+        .nav-link .nav-icon {
+            color: var(--theme-color);
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-hover);
+            border-color: var(--theme-color);
+            color: var(--theme-color);
+            transform: translateY(-5px);
+        }
+
+        .nav-link.active {
+            background: var(--theme-color);
+            color: var(--text-on-active);
+            border-color: var(--theme-color);
+            box-shadow: 0 0 20px var(--theme-color);
+        }
+
+        .nav-link.active .nav-icon { color: var(--text-on-active); }
+        .nav-icon { font-size: 1.2rem; }
+
+        .demon-icon {
+            width: 1.4rem;
+            height: 1.4rem;
+            object-fit: contain;
+            vertical-align: -0.25rem;
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+        }
+
+        .controls-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid #444;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 400px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(254, 193, 42, 0.2);
+            background: rgba(30, 30, 30, 0.8);
+        }
+
+        .refresh-btn {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid #444;
+            color: var(--gold);
+            padding: 0 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .refresh-btn:hover {
+            background: rgba(254, 193, 42, 0.1);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(254, 193, 42, 0.1);
+        }
+
+        .refresh-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .refresh-btn i {
+            transition: transform 0.5s ease;
+        }
+
+        .refresh-btn:hover i {
+            transform: rotate(180deg);
+        }
+
+        .leaderboard-container {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid #333;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        #stars { --section-color: var(--color-stars); }
+        #moons { --section-color: var(--color-moons); }
+        #diamonds { --section-color: var(--color-diamonds); }
+        #usercoins { --section-color: var(--color-coins); }
+        #demons { --section-color: var(--color-demons); }
+        #creator { --section-color: var(--color-creator); }
+
+        .leaderboard-title {
+            text-align: center;
+            color: var(--section-color);
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+            min-height: 200px;
+        }
+
+        @media (max-width: 1200px) { .player-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 992px) { .player-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .player-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 576px) { .player-grid { grid-template-columns: 1fr; } }
+
+        .player-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid #333;
+            animation: slideIn 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .player-card:hover {
+            background: var(--bg-hover);
+            transform: scale(1.05);
+            border-color: var(--section-color);
+            z-index: 2;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .player-card.top-three {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 1px solid var(--section-color);
+        }
+
+        .player-card.top-three:hover { box-shadow: 0 0 20px var(--section-color); }
+
+        .player-rank {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .trophy-icon { font-size: 1.2rem; }
+        .rank-1 .trophy-icon { color: var(--gold); }
+        .rank-2 .trophy-icon { color: var(--silver); }
+        .rank-3 .trophy-icon { color: var(--bronze); }
+
+        .player-name {
+            font-size: 1.1rem;
+            color: var(--section-color);
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ddd;
+            font-weight: 600;
+            background: rgba(0,0,0,0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .value-icon { color: var(--section-color); }
+
+        .category-section { display: none; }
+        .category-section.active { display: block; animation: fadeIn 0.5s ease; }
+        
+        .loading-container {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+            font-style: italic;
+            display: none;
+        }
+        .loading-container i { margin-right: 10px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .error-msg {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 20px;
+            color: #ff5555;
+            background: rgba(255,0,0,0.1);
+            border-radius: 10px;
+            border: 1px solid #ff5555;
+        }
+        .retry-btn {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .retry-btn:hover { background: #444; }
+
+    </style>
+</head>
+<body>
+    <div id="bg-animation-container"></div>
+
+    <div class="container">
+        <h1 class="main-header"></h1>
+
+        <nav class="nav-menu">
+            <div class="d-flex flex-wrap justify-content-center">
+                <div class="nav-item">
+                    <a href="#" class="nav-link active" data-category="stars">
+                        <i class="fas fa-star nav-icon"></i> Stars
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-category="moons">
+                        <i class="fas fa-moon nav-icon"></i> Moons
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-category="diamonds">
+                        <i class="fas fa-gem nav-icon"></i> Diamonds
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-category="usercoins">
+                        <i class="fas fa-coins nav-icon"></i> User Coins
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-category="demons">
+                        <img src="1f608.png" class="demon-icon nav-icon" alt="Demons"> Demons
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-category="creator">
+                        <i class="fas fa-hammer nav-icon"></i> Creator Points
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="controls-container">
+            <input type="text" id="player-search" class="search-input" placeholder="Játékos keresése a listában...">
+            <button id="force-refresh" class="refresh-btn" onclick="forceRefresh()">
+                <i class="fas fa-sync-alt"></i> Adatok Frissítése
+            </button>
+        </div>
+
+        <div class="leaderboard-container">
+            
+            <div class="category-section active" id="stars">
+                <h2 class="leaderboard-title"><i class="fas fa-star"></i>Stars</h2>
+                <div class="loading-container" id="loading-stars">
+                    <i class="fas fa-circle-notch"></i> Adatok letöltése...
+                </div>
+                <div class="player-grid" id="grid-stars"></div>
+            </div>
+
+            <div class="category-section" id="moons">
+                <h2 class="leaderboard-title"><i class="fas fa-moon"></i>Moons</h2>
+                <div class="loading-container" id="loading-moons">
+                    <i class="fas fa-circle-notch"></i> Adatok rendezése...
+                </div>
+                <div class="player-grid" id="grid-moons"></div>
+            </div>
+
+            <div class="category-section" id="diamonds">
+                <h2 class="leaderboard-title"><i class="fas fa-gem"></i>Diamonds</h2>
+                <div class="loading-container" id="loading-diamonds">
+                    <i class="fas fa-circle-notch"></i> Adatok rendezése...
+                </div>
+                <div class="player-grid" id="grid-diamonds"></div>
+            </div>
+
+            <div class="category-section" id="usercoins">
+                <h2 class="leaderboard-title"><i class="fas fa-coins"></i>User Coins</h2>
+                <div class="loading-container" id="loading-usercoins">
+                    <i class="fas fa-circle-notch"></i> Adatok rendezése...
+                </div>
+                <div class="player-grid" id="grid-usercoins"></div>
+            </div>
+
+            <div class="category-section" id="demons">
+                <h2 class="leaderboard-title">
+                    <img src="1f608.png" class="demon-icon" style="width: 2.5rem; height: 2.5rem;" alt="Demons">
+                    Demons
+                </h2>
+                <div class="loading-container" id="loading-demons">
+                    <i class="fas fa-circle-notch"></i> Adatok rendezése...
+                </div>
+                <div class="player-grid" id="grid-demons"></div>
+            </div>
+
+            <div class="category-section" id="creator">
+                <h2 class="leaderboard-title"><i class="fas fa-hammer"></i>Creator Points</h2>
+                <div class="loading-container" id="loading-creator">
+                    <i class="fas fa-circle-notch"></i> Adatok rendezése...
+                </div>
+                <div class="player-grid" id="grid-creator"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        
+        const RAW_PLAYERS = [
+            "trexhun", "Leviax", "BlasterLizard", "Krisz", "Andras9912", "KMJFIRE", "AlexayMarton", 
+            "kreno", "TrickyBonkers", "IlIIlllIlIlI", "GgDashie", "arkwada", "Szilu", "mag", 
+            "ItzVmark", "Zsombi", "NotDarpy", "vcss", "gBen", "capaxl", "kri5z", "DiceXD3", 
+            "Airaga", "64x", "AceandBlast", "SuBZeRO555", "Somniare", "Bendzsu89", "bodza", 
+            "Leves", "Gaaboor", "Lorserix", "DARTSY1", "TheTrueRdam", "BLASTAHGD", "KZD78", 
+            "GrandpaTom", "AppleIdkPen", "LeverEnd", "TinyMapCreator", "neitie", "MechanicGD", 
+            "Keselowski2", "Massck", "7riPlays", "Ephyaltes", "Valkai123", "KeCsan01", "tonkesz11", 
+            "Beatyoco", "Zodacx", "MZeno07", "aTsukiakari", "szebo210", "N1mr0d", "nebulatic", 
+            "Gouldberg", "Solerix", "Avlaboba", "m3ndel", "Teddyx", "LenjoyGD", "Pongix", 
+            "PepsiBong", "punor", "zBiscuit", "JocX", "adniW", "malvin166", "DrakeX5", "TRraim", 
+            "RazorGMD11", "oniel1117", "CringeLord GD", "PulseN1nja", "BenikeGamer", "PetiGyerek", 
+            "Migam8", "nytroW", "Palinka", "Galaxygamer1m1", "kovigregi", "semi42", "AdamTheGreat02", 
+            "Interferent", "6almas5let", "averiee", "macoh", "Nevgelen", "Teyyo", "lalimatyuss", 
+            "Goxikolid", "zZiizZy", "VRTGq", "9767", "Pigys", "whoiskeve", "garlicisbald", 
+            "Phan7xm", "krisztianw", "Frixnipe", "Firelia", "apeti", "Csavesz", "Daewe", 
+            "DaeweDash", "MarkiXonGD", "matyi0", "Gerimatod", "O10one", "gergo123456", "chirpie", 
+            "kaministorm", "wMixy", "Serpentical", "Shyze", "ShiveringStars0", "pPaarketta", "Morzsika",
+            "Libakoptato", "Kisgrofo", "kacsloz", "GDWaterGMD", "BVviktor", "Bandi006", "BaloghRicsi",
+            "Balint1117", "AtiDaNub"
+        ];
+
+        const HUNGARIAN_PLAYERS = [...new Set(RAW_PLAYERS)];
+        const API_BASE = "https://gdbrowser.com/api/profile";
+
+        const categoryConfig = {
+            stars: { apiType: 'stars', icon: '<i class="fas fa-star value-icon"></i>', animColor: 'var(--color-stars)', animIcon: '<i class="fas fa-star"></i>' },
+            moons: { apiType: 'moons', icon: '<i class="fas fa-moon value-icon"></i>', animColor: 'var(--color-moons)', animIcon: '<i class="fas fa-moon"></i>' },
+            diamonds: { apiType: 'diamonds', icon: '<i class="fas fa-gem value-icon"></i>', animColor: 'var(--color-diamonds)', animIcon: '<i class="fas fa-gem"></i>' },
+            usercoins: { apiType: 'userCoins', icon: '<i class="fas fa-coins value-icon"></i>', animColor: 'var(--color-coins)', animIcon: '<i class="fas fa-coins"></i>' },
+            demons: { apiType: 'demons', icon: '<img src="1f608.png" class="demon-icon value-icon" alt="Demon">', animColor: 'var(--color-demons)', animIcon: '<img src="1f608.png" alt="demon">' },
+            creator: { apiType: 'cp', icon: '<i class="fas fa-hammer value-icon"></i>', animColor: 'var(--color-creator)', animIcon: '<i class="fas fa-hammer"></i>' }
+        };
+
+        let GLOBAL_PLAYER_DATA = null; 
+        let IS_FETCHING = false;
+        let currentCategoryType = 'stars';
+
+        let animationInterval;
+        const animContainer = document.getElementById('bg-animation-container');
+
+        function startBackgroundAnimation(category) {
+            clearInterval(animationInterval);
+            animContainer.innerHTML = '';
+            const config = categoryConfig[category];
+            if (!config) return;
+            animationInterval = setInterval(() => { createFallingItem(config); }, 300);
+        }
+
+        function createFallingItem(config) {
+            const item = document.createElement('div');
+            item.classList.add('falling-item');
+            item.innerHTML = config.animIcon;
+            const left = Math.random() * 100;
+            const duration = Math.random() * 5 + 5;
+            const size = Math.random() * 20 + 20;
+            item.style.left = `${left}%`;
+            item.style.animationDuration = `${duration}s`;
+            item.style.fontSize = `${size}px`;
+            item.style.width = `${size}px`;
+            item.style.color = config.animColor;
+            animContainer.appendChild(item);
+            setTimeout(() => { item.remove(); }, duration * 1000);
+        }
+
+        async function fetchAllPlayers(playerList) {
+            const batchSize = 15;
+            const delay = 1200;
+            let results = [];
+            
+            document.getElementById('force-refresh').disabled = true;
+            
+            for (let i = 0; i < playerList.length; i += batchSize) {
+                const batch = playerList.slice(i, i + batchSize);
+                updateLoadingText(`Adatok letöltése... (${i}/${playerList.length})`);
+                
+                const promises = batch.map(username => 
+                    fetch(`${API_BASE}/${username}`)
+                        .then(res => {
+                            if(!res.ok) return null; 
+                            return res.json();
+                        })
+                        .catch(err => null)
+                );
+                
+                const batchResults = await Promise.all(promises);
+                results = results.concat(batchResults);
+
+                if (i + batchSize < playerList.length) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+            
+            document.getElementById('force-refresh').disabled = false;
+            return results.filter(p => p !== null);
+        }
+
+        function updateLoadingText(text) {
+            document.querySelectorAll('.loading-container').forEach(div => {
+                if(div.style.display === 'block') {
+                    div.innerHTML = `<i class="fas fa-circle-notch"></i> ${text}`;
+                }
+            });
+        }
+
+        function renderPlayers(players, category, searchTerm = "") {
+            const config = categoryConfig[category];
+            const grid = document.getElementById(`grid-${category}`);
+            if (!grid) return;
+
+            let filteredPlayers = players.filter(p => 
+                p.username.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            const limit = (category === 'creator') ? 40 : 50;
+            
+            let sortKey = 'stars';
+            if (config.apiType === 'moons') sortKey = 'moons';
+            else if (config.apiType === 'diamonds') sortKey = 'diamonds';
+            else if (config.apiType === 'userCoins') sortKey = 'userCoins'; 
+            else if (config.apiType === 'demons') sortKey = 'demons';
+            else if (config.apiType === 'cp') sortKey = 'cp';
+
+            filteredPlayers.sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
+            filteredPlayers = filteredPlayers.slice(0, limit);
+
+            if (filteredPlayers.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:20px; color: #888;">Nincs találat.</div>';
+                return;
+            }
+
+            let htmlContent = '';
+            filteredPlayers.forEach((player, index) => {
+                const rank = index + 1; 
+                const isTopThree = rank <= 3;
+                const cardClass = `player-card ${isTopThree ? 'top-three' : ''} ${isTopThree ? 'rank-' + rank : ''}`;
+                const nameClass = isTopThree ? 'top-three' : '';
+
+                let trophyHtml = '';
+                if (rank === 1) trophyHtml = '<i class="fas fa-trophy trophy-icon"></i>';
+                else if (rank === 2 || rank === 3) trophyHtml = '<i class="fas fa-medal trophy-icon"></i>';
+
+                let value = player[sortKey];
+                const formattedValue = new Intl.NumberFormat('en-US').format(value || 0);
+
+                htmlContent += `
+                    <div class="${cardClass}">
+                        <div class="player-rank">#${rank}</div>
+                        <div class="player-info">
+                            ${trophyHtml}
+                            <span class="player-name ${nameClass}" title="${player.username}">${player.username}</span>
+                        </div>
+                        <div class="player-value">
+                            ${config.icon}
+                            <span>${formattedValue}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = htmlContent;
+        }
+
+        async function handleCategoryChange(category) {
+            currentCategoryType = category;
+            
+            const grid = document.getElementById(`grid-${category}`);
+            const loading = document.getElementById(`loading-${category}`);
+            
+            if(loading) loading.style.display = 'block';
+            if(grid) grid.style.display = 'none'; 
+
+            try {
+                if (!GLOBAL_PLAYER_DATA) {
+                    if (!IS_FETCHING) {
+                        IS_FETCHING = true;
+                        const data = await fetchAllPlayers(HUNGARIAN_PLAYERS);
+                        if (data.length === 0) throw new Error("Üres lista jött vissza");
+                        GLOBAL_PLAYER_DATA = data;
+                        IS_FETCHING = false;
+                    } else {
+                        while(IS_FETCHING) await new Promise(r => setTimeout(r, 500));
+                    }
+                }
+
+                if(GLOBAL_PLAYER_DATA && GLOBAL_PLAYER_DATA.length > 0) {
+                    renderPlayers(GLOBAL_PLAYER_DATA, category, document.getElementById('player-search').value);
+                    if(grid) grid.style.display = 'grid';
+                } else {
+                    throw new Error("Nincs megjeleníthető adat.");
+                }
+
+            } catch (error) {
+                console.error(error);
+                if(grid) {
+                    grid.style.display = 'grid';
+                    grid.innerHTML = `
+                        <div class="error-msg">
+                            Hiba történt az adatok lekérésekor.<br>
+                            <small>${error.message}</small><br>
+                            <button class="retry-btn" onclick="retryFetch()">Újrapróbálkozás</button>
+                        </div>`;
+                }
+                GLOBAL_PLAYER_DATA = null;
+                IS_FETCHING = false;
+            } finally {
+                if(loading) loading.style.display = 'none';
+            }
+        }
+
+        function retryFetch() {
+            handleCategoryChange(currentCategoryType);
+        }
+
+        function forceRefresh() {
+            if(IS_FETCHING) return; 
+            
+            if(confirm("Biztosan frissíteni akarod az adatokat? Ez eltarthat egy ideig.")) {
+                GLOBAL_PLAYER_DATA = null;
+                
+                const grids = document.querySelectorAll('.player-grid');
+                grids.forEach(g => g.innerHTML = '');
+
+                handleCategoryChange(currentCategoryType);
+            }
+        }
+
+        document.getElementById('player-search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value;
+            if (GLOBAL_PLAYER_DATA) {
+                renderPlayers(GLOBAL_PLAYER_DATA, currentCategoryType, searchTerm);
+            }
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.category-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                const category = this.getAttribute('data-category');
+                
+                document.getElementById('player-search').value = '';
+                
+                const targetSection = document.getElementById(category);
+                if (targetSection) targetSection.classList.add('active');
+
+                startBackgroundAnimation(category);
+                handleCategoryChange(category);
+            });
+        });
+
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s';
+                document.body.style.opacity = '1';
+            }, 100);
+
+            startBackgroundAnimation('stars');
+            handleCategoryChange('stars');
+        });
+    </script>
+</body>
+</html>
