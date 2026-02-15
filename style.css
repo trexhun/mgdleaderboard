@@ -98,7 +98,7 @@ body {
     border-color: #555;
 }
 
-/* --- Aktív Gomb Stílusok (Javított) --- */
+/* --- Aktív Gomb Stílusok --- */
 .nav-link.active {
     transform: translateY(-5px) scale(1.03); /* Kiemelkedés */
     border-color: rgba(255,255,255,0.8);
@@ -140,10 +140,17 @@ body {
     color: white;
 }
 
-/* Creator Points: Narancs/Barna (Glowy style) */
+/* Creator Points: Narancs/Barna */
 .nav-link[data-category="creator"].active {
     background: linear-gradient(135deg, #ffa500 0%, #cd853f 100%);
     box-shadow: 0 0 20px rgba(205, 133, 63, 0.6);
+    color: black;
+}
+
+/* Rated Levels: "Safe" Sárgás-Narancs */
+.nav-link[data-category="rated"].active {
+    background: linear-gradient(135deg, #ffae00 0%, #ff7300 100%);
+    box-shadow: 0 0 20px rgba(255, 140, 0, 0.6);
     color: black;
 }
 

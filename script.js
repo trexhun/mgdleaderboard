@@ -25,7 +25,8 @@ const categoryConfig = {
     diamonds: { apiType: 'diamonds', icon: 'src/diamond.png' },
     usercoins: { apiType: 'userCoins', icon: 'src/silvercoin.png' },
     demons: { apiType: 'demons', icon: 'src/demon-hard.png' },
-    creator: { apiType: 'cp', icon: 'src/creator_points.png' }
+    creator: { apiType: 'cp', icon: 'src/creator_points.png' },
+    rated: { apiType: 'cp', icon: 'src/creator_points.png' } // A CP alapján rendezünk, de a safe ikont használjuk
 };
 
 let GLOBAL_PLAYER_DATA = null; 
@@ -38,7 +39,6 @@ function getIconUrl(p, form = "icon", iconId = null) {
     const col1 = p.color !== undefined ? p.color : 0;
     const col2 = p.color2 !== undefined ? p.color2 : 3;
     const glow = p.glow !== undefined ? (p.glow ? 1 : 0) : 0;
-    
     
     return `https://gdbrowser.com/icon/${encodeURIComponent(p.username)}?form=${form}&icon=${targetIcon}&col1=${col1}&col2=${col2}&glow=${glow}`;
 }
@@ -92,13 +92,27 @@ function updateLoadingText(t) {
     if(loader) loader.innerHTML = `<i class="fas fa-circle-notch"></i> ${t}`;
 }
 
-function generatePlayerCard(player, rank, value, iconPath) {
+function generatePlayerCard(player, rank, value, iconPath, category) {
     const isTop3 = rank <= 3;
+    let clickAction;
+    
+    // Ha a kategória "rated", akkor új ablakban nyitjuk meg a GDBrowsert
+    if (category === 'rated') {
+        clickAction = `window.open('https://gdbrowser.com/search/${player.username}?user', '_blank')`;
+    } else {
+        // Minden más esetben a modális ablakot nyitjuk meg
+        clickAction = `openModal('${player.username.replace(/'/g, "\\'")}')`;
+    }
+
+    // MÓDOSÍTÁS: Csak akkor mutatjuk a CP badge-et a sarokban, ha NEM a 'rated' kategóriában vagyunk.
+    // (A rated-nél lent van a safe ikon, fent pedig felesleges a kalapács).
+    const showCpBadge = player.cp > 0 && category !== 'rated';
+
     return `
-        <div class="player-card ${isTop3 ? 'top-three rank-' + rank : ''}" onclick="openModal('${player.username.replace(/'/g, "\\'")}')">
+        <div class="player-card ${isTop3 ? 'top-three rank-' + rank : ''}" onclick="${clickAction}">
             <div class="card-badges">
                 ${MODERATORS.includes(player.username) ? '<img src="src/mod.png" class="badge-icon">' : ''}
-                ${player.cp > 0 ? '<img src="src/creator_points.png" class="badge-icon">' : ''}
+                ${showCpBadge ? '<img src="src/creator_points.png" class="badge-icon">' : ''}
             </div>
             <div class="player-rank">#${rank}</div>
             <div class="player-info">
@@ -117,12 +131,25 @@ function renderPlayers(players, category, search = "") {
     if (!grid) return;
     const config = categoryConfig[category];
     let sorted = [...players].sort((a, b) => (b[config.apiType] || 0) - (a[config.apiType] || 0));
+    
     let display = sorted.map((p, i) => ({ ...p, _rank: i + 1 }));
     
-    if (search.trim()) display = display.filter(p => p.username.toLowerCase().includes(search.toLowerCase()));
-    else display = display.slice(0, 50);
+    // Szűrés, ha keresünk
+    if (search.trim()) {
+        display = display.filter(p => p.username.toLowerCase().includes(search.toLowerCase()));
+    }
+    
+    // SPECIÁLIS SZŰRÉS: Rated Levels
+    // Csak azokat jelenítjük meg, akiknek van CP-jük (Creator Points > 0)
+    if (category === 'rated') {
+        display = display.filter(p => p.cp > 0);
+    } else if (!search.trim()) {
+        // Egyéb kategóriáknál, ha nincs keresés, csak az első 50-et mutatjuk
+        display = display.slice(0, 50);
+    }
 
-    grid.innerHTML = display.map(p => generatePlayerCard(p, p._rank, p[config.apiType], config.icon)).join('');
+    // A generáló függvénynek átadjuk a category-t is, hogy tudja kezelni a kattintást
+    grid.innerHTML = display.map(p => generatePlayerCard(p, p._rank, p[config.apiType], config.icon, category)).join('');
 }
 
 function openModal(username) {
