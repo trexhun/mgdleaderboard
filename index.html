@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
@@ -14,43 +14,38 @@
     <div id="bg-animation-container"></div>
 
     <div class="container">
-        <h1 class="main-header"></h1>
+        <h1 class="main-header">Magyar GD Ranglista</h1>
 
         <nav class="nav-menu">
             <div class="d-flex flex-wrap justify-content-center">
                 <div class="nav-item">
                     <a href="#" class="nav-link active" data-category="stars">
-                        <img src="src/star.png" class="icon-img" alt="Stars"> Stars
+                        <img src="src/star.png" class="icon-img" alt=""> Stars
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="#" class="nav-link" data-category="moons">
-                        <img src="src/moon.png" class="icon-img" alt="Moons"> Moons
+                        <img src="src/moon.png" class="icon-img" alt=""> Moons
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="#" class="nav-link" data-category="diamonds">
-                        <img src="src/diamond.png" class="icon-img" alt="Diamonds"> Diamonds
+                        <img src="src/diamond.png" class="icon-img" alt=""> Diamonds
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="#" class="nav-link" data-category="usercoins">
-                        <img src="src/silvercoin.png" class="icon-img" alt="User Coins"> User Coins
+                        <img src="src/silvercoin.png" class="icon-img" alt=""> User Coins
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="#" class="nav-link" data-category="demons">
-                        <img src="src/demon-hard.png" class="icon-img" alt="Demons"> Demons
+                        <img src="src/demon-hard.png" class="icon-img" alt=""> Demons
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="#" class="nav-link" data-category="creator">
-                        <img src="src/creator_points.png" class="icon-img" alt="Creator Points"> Creator Points
-                    </a>
-                </div>
-                  <div class="nav-item">
-                    <a href="#" class="nav-link" data-category="hun_levels">
-                        <img src="src/safe.png" class="icon-img" alt="Hun Levels">Rated Levels
+                        <img src="src/creator_points.png" class="icon-img" alt=""> Creator Points
                     </a>
                 </div>
             </div>
@@ -58,73 +53,21 @@
 
         <div class="controls-container">
             <input type="text" id="player-search" class="search-input" placeholder="Keresés...">
-            <button id="force-refresh" class="refresh-btn" onclick="forceRefresh()">
+            <button id="force-refresh" class="refresh-btn" onclick="executeRefresh()">
                 <i class="fas fa-sync-alt"></i> Adatok frissítése
             </button>
         </div>
 
         <div class="leaderboard-container">
-            
             <div class="category-section active" id="stars">
-                <div class="loading-container" id="loading-stars">
-                    <i class="fas fa-circle-notch"></i> 
-                </div>
+                <div class="loading-container" id="loading-stars" style="display:block"><i class="fas fa-circle-notch"></i> Adatok betöltése...</div>
                 <div class="player-grid" id="grid-stars"></div>
             </div>
-
-            <div class="category-section" id="hun_levels">
-                
-                <div class="pagination-container" id="pagination-top">
-                    <button class="page-btn" id="prev-page-top"><i class="fas fa-chevron-left"></i> Előző</button>
-                    <span id="page-indicator-top">1 / 1</span>
-                    <button class="page-btn" id="next-page-top">Következő <i class="fas fa-chevron-right"></i></button>
-                </div>
-
-                <div class="player-grid" id="grid-hun_levels"></div>
-
-                <div class="pagination-container pagination-bottom" id="pagination-bottom">
-                    <button class="page-btn" id="prev-page-bottom"><i class="fas fa-chevron-left"></i> Előző</button>
-                    <span id="page-indicator-bottom">1 / 1</span>
-                    <button class="page-btn" id="next-page-bottom">Következő <i class="fas fa-chevron-right"></i></button>
-                </div>
-            </div>
-
-            <div class="category-section" id="moons">
-                <div class="loading-container" id="loading-moons">
-                    <i class="fas fa-circle-notch"></i> Adatok betöltése...
-                </div>
-                <div class="player-grid" id="grid-moons"></div>
-            </div>
-
-            <div class="category-section" id="diamonds">
-                <div class="loading-container" id="loading-diamonds">
-                    <i class="fas fa-circle-notch"></i> Adatok betöltése...
-                </div>
-                <div class="player-grid" id="grid-diamonds"></div>
-            </div>
-
-            <div class="category-section" id="usercoins">
-                <div class="loading-container" id="loading-usercoins">
-                    <i class="fas fa-circle-notch"></i> Adatok betöltése...
-                </div>
-                <div class="player-grid" id="grid-usercoins"></div>
-            </div>
-
-            <div class="category-section" id="demons">
-                <div class="loading-container" id="loading-demons">
-                    <i class="fas fa-circle-notch"></i> Adatok betöltése...
-                </div>
-                
-                <div class="player-grid" id="grid-demons"></div>
-            </div>
-
-            <div class="category-section" id="creator">
-                <div class="loading-container" id="loading-creator">
-                    <i class="fas fa-circle-notch"></i> Adatok betöltése...
-                </div>
-                <div class="player-grid" id="grid-creator"></div>
-            </div>
-
+            <div class="category-section" id="moons"><div class="loading-container" id="loading-moons"></div><div class="player-grid" id="grid-moons"></div></div>
+            <div class="category-section" id="diamonds"><div class="loading-container" id="loading-diamonds"></div><div class="player-grid" id="grid-diamonds"></div></div>
+            <div class="category-section" id="usercoins"><div class="loading-container" id="loading-usercoins"></div><div class="player-grid" id="grid-usercoins"></div></div>
+            <div class="category-section" id="demons"><div class="loading-container" id="loading-demons"></div><div class="player-grid" id="grid-demons"></div></div>
+            <div class="category-section" id="creator"><div class="loading-container" id="loading-creator"></div><div class="player-grid" id="grid-creator"></div></div>
         </div>
     </div>
 
@@ -134,44 +77,21 @@
                 Tervezés és Dizájn: <span class="footer-name">trexhun</span> <span class="footer-separator">|</span> Fejlesztette: <span class="footer-name">TomYx</span>
             </div>
             <div class="footer-disclaimer-secondary">
-                Game assets and sprites belong to <a href="https://www.robtopgames.com/" target="_blank" class="footer-link"><strong>RobTop Games</strong></a>.
+                Game assets and sprites belong to <a href="https://www.robtopgames.com/" target="_blank" class="footer-link footer-name"><strong>RobTop Games</strong></a>.
             </div>
             <div class="footer-disclaimer-secondary">
-                Data provided by <a href="https://gdbrowser.com/" target="_blank" class="footer-link">GDBrowser</a> (by GDColon).
+                Data provided by <a href="https://gdbrowser.com/" target="_blank" class="footer-link footer-name"><strong>GDBrowser</strong></a> (by GDColon).
             </div>
         </div>
     </footer>
 
-    <div id="profile-modal" class="modal-overlay">
-        <div class="modal-content">
+    <div id="profile-modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
             <span class="close-modal" onclick="closeModal()">&times;</span>
-            <div id="modal-body">
-                </div>
+            <div id="modal-body"></div>
         </div>
     </div>
 
-    <div id="confirmation-modal" class="modal-overlay">
-        <div class="modal-content confirmation-box">
-            <div class="confirmation-header">
-                <i class="fas fa-exclamation-triangle warning-icon"></i>
-                <h3>Megerősítés</h3>
-            </div>
-            <p class="confirmation-text">
-                Biztos, hogy újraszeretnéd tölteni az összes adatot?<br>
-                <span class="confirmation-subtext">Ez a folyamat eltarthat néhány percig.</span>
-            </p>
-            <div class="confirmation-buttons">
-                <button class="btn-cancel" onclick="closeConfirmationModal()">Mégse</button>
-                <button class="btn-confirm" onclick="executeRefresh()">Igen, Frissítés</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast-notification" class="toast-notification">
-        <i class="fas fa-check-circle"></i> <span id="toast-message"></span>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
