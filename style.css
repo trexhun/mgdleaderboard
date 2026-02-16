@@ -53,15 +53,30 @@ body {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5) !important;
 }
 
+/* --- HEADER STYLES --- */
 .main-header {
     text-align: center;
     padding: 40px 0;
-    color: var(--gold);
     font-size: 3rem;
     font-weight: bold;
-    text-shadow: 0 0 15px rgba(254, 193, 42, 0.3);
     position: relative;
     z-index: 2;
+}
+
+/* Magyar zászló színek neon effekttel */
+.hun-red {
+    color: #ff3333;
+    text-shadow: 0 0 15px rgba(255, 51, 51, 0.6);
+}
+
+.hun-white {
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+}
+
+.hun-green {
+    color: #44ff44;
+    text-shadow: 0 0 15px rgba(68, 255, 68, 0.6);
 }
 
 /* --- Navigáció --- */
@@ -83,7 +98,7 @@ body {
     border-radius: 10px;
     padding: 15px 10px;
     font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Rugalmas animáció */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex; align-items: center; justify-content: center;
     gap: 10px; text-decoration: none;
     border: 1px solid #333;
@@ -100,54 +115,42 @@ body {
 
 /* --- Aktív Gomb Stílusok --- */
 .nav-link.active {
-    transform: translateY(-5px) scale(1.03); /* Kiemelkedés */
+    transform: translateY(-5px) scale(1.03);
     border-color: rgba(255,255,255,0.8);
     z-index: 10;
 }
 
-/* Stars: Arany/Sárga */
+/* Kategória specifikus színek */
 .nav-link[data-category="stars"].active {
     background: linear-gradient(135deg, #fec12a 0%, #d4a017 100%);
     box-shadow: 0 0 20px rgba(254, 193, 42, 0.6);
     color: black;
 }
-
-/* Moons: Kék */
 .nav-link[data-category="moons"].active {
     background: linear-gradient(135deg, #4d9be6 0%, #1e3c72 100%);
     box-shadow: 0 0 20px rgba(77, 155, 230, 0.6);
     color: white;
 }
-
-/* Diamonds: Cián */
 .nav-link[data-category="diamonds"].active {
     background: linear-gradient(135deg, #00ffff 0%, #008b8b 100%);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
     color: black;
 }
-
-/* User Coins: Ezüst */
 .nav-link[data-category="usercoins"].active {
     background: linear-gradient(135deg, #e0e0e0 0%, #a0a0a0 100%);
     box-shadow: 0 0 20px rgba(192, 192, 192, 0.5);
     color: black;
 }
-
-/* Demons: Vörös */
 .nav-link[data-category="demons"].active {
     background: linear-gradient(135deg, #ff4040 0%, #8b0000 100%);
     box-shadow: 0 0 20px rgba(255, 64, 64, 0.6);
     color: white;
 }
-
-/* Creator Points: Narancs/Barna */
 .nav-link[data-category="creator"].active {
     background: linear-gradient(135deg, #ffa500 0%, #cd853f 100%);
     box-shadow: 0 0 20px rgba(205, 133, 63, 0.6);
     color: black;
 }
-
-/* Rated Levels: "Safe" Sárgás-Narancs */
 .nav-link[data-category="rated"].active {
     background: linear-gradient(135deg, #ffae00 0%, #ff7300 100%);
     box-shadow: 0 0 20px rgba(255, 140, 0, 0.6);
@@ -208,8 +211,22 @@ body {
     position: absolute; top: 8px; right: 8px;
     display: flex; flex-direction: row-reverse; gap: 5px;
     z-index: 10;
+    align-items: center; 
 }
-.badge-icon { width: 22px; height: 22px; }
+.badge-icon { width: 22px; height: 22px; object-fit: contain; }
+
+/* --- Globális Trófea KÉP Stílus --- */
+.global-trophy-img {
+    height: 26px; /* Kicsit nagyobbra vesszük, hogy látszódjon a részlet */
+    width: auto;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.4)); /* Enyhe ragyogás a kép mögött */
+    transition: transform 0.2s ease;
+}
+
+.global-trophy-img:hover {
+    transform: scale(1.2) rotate(5deg);
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+}
 
 .player-rank { font-size: 0.9rem; color: var(--text-muted); font-weight: bold; margin-bottom: 5px; }
 
