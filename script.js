@@ -1,4 +1,3 @@
-// Játékosok listája
 const RAW_PLAYERS = ["trexhun", "Leviax", "BlasterLizard", "Krisz", "Andras9912", "KMJFIRE", "AlexayMarton", "kreno", 
     "TrickyBonkers", "IlIIlllIlIlI", "GgDashie", "arkwada", "Szilu", "mag", "ItzVmark", "Zsombi", "NotDarpy", "vcss", "gBen", "capaxl", "kri5z", 
     "DiceXD3", "Airaga", "64x", "AceandBlast", "SuBZeRO555", "Somniare", "Bendzsu89", "bodza", "Leves", "Gaaboor", "Lorserix", "DARTSY1", 
@@ -17,7 +16,6 @@ const RAW_PLAYERS = ["trexhun", "Leviax", "BlasterLizard", "Krisz", "Andras9912"
 const HUNGARIAN_PLAYERS = [...new Set(RAW_PLAYERS)]; 
 const API_BASE = "https://gdbrowser.com/api/profile";
 const MODERATORS = ["mag"]; 
-// Frissítettem a cache kulcsot v2-re, hogy kényszerítsük az újratöltést!
 const CACHE_KEY = 'gd_leaderboard_cache_v2';
 const CACHE_TIME = 10 * 60 * 1000; 
 
@@ -43,7 +41,6 @@ function getIconUrl(p, form = "icon", iconId = null) {
     return `https://gdbrowser.com/icon/${encodeURIComponent(p.username)}?form=${form}&icon=${targetIcon}&col1=${col1}&col2=${col2}&glow=${glow}`;
 }
 
-// ÚJ FÜGGVÉNY: Trófea képek kiválasztása
 function getTrophyImage(rank) {
     if (!rank) return null;
     if (rank === 1) return 'src/rank_01.png';
@@ -51,7 +48,7 @@ function getTrophyImage(rank) {
     if (rank <= 50) return 'src/rank_50.png';
     if (rank <= 100) return 'src/rank_100.png';
     if (rank <= 200) return 'src/rank_200.png';
-    if (rank <= 500) return 'src/rank_500.png'; // Figyelem: ez a fájl hiányzik nálad, pótold!
+    if (rank <= 500) return 'src/rank_500.png'; 
     if (rank <= 1000) return 'src/rank_1000.png';
     return null;
 }
@@ -104,13 +101,11 @@ function generatePlayerCard(player, rank, value, iconPath, category) {
     if (category === 'rated') {
         clickAction = `window.open('https://gdbrowser.com/search/${player.username}?user', '_blank')`;
     } else {
-        // A replace hívásnál figyelni kell az idézőjelekre
         clickAction = `openModal('${player.username.replace(/'/g, "\\'")}')`;
     }
 
     const showCpBadge = player.cp > 0 && category !== 'rated';
 
-    // Logika a trófea képhez
     let trophyHtml = '';
     if (category === 'stars' && player.rank > 0 && player.rank <= 1000) {
         const trophySrc = getTrophyImage(player.rank);
@@ -145,26 +140,19 @@ function renderPlayers(players, category, search = "") {
     const config = categoryConfig[category];
     if (!config) return;
 
-    // Adatok rendezése
     let sorted = [...players].sort((a, b) => (b[config.apiType] || 0) - (a[config.apiType] || 0));
-    
-    // Rang hozzáadása
     let display = sorted.map((p, i) => ({ ...p, _rank: i + 1 }));
     
-    // Keresés szűrés
     if (search.trim()) {
         display = display.filter(p => p.username.toLowerCase().includes(search.toLowerCase()));
     }
     
-    // Rated levels szűrés (csak CP-vel rendelkezők)
     if (category === 'rated') {
         display = display.filter(p => p.cp > 0);
     } else if (!search.trim()) {
-        // Alapból csak top 50, ha nincs keresés
         display = display.slice(0, 50);
     }
 
-    // HTML generálás
     grid.innerHTML = display.map(p => generatePlayerCard(p, p._rank, p[config.apiType], config.icon, category)).join('');
 }
 
@@ -215,13 +203,11 @@ async function handleCategoryChange(cat) {
     const loader = document.getElementById(`loading-${cat}`);
     if(loader) loader.style.display = 'block';
     
-    // Ha még nincs adat, vagy folyamatban van a lekérés
     if (!GLOBAL_PLAYER_DATA && !IS_FETCHING) {
         IS_FETCHING = true;
         GLOBAL_PLAYER_DATA = await fetchAllPlayers(HUNGARIAN_PLAYERS);
         IS_FETCHING = false;
     } else if (IS_FETCHING) {
-        // Ha épp tölt, várjunk kicsit (egyszerű megoldás)
         while(IS_FETCHING) {
             await new Promise(r => setTimeout(r, 100));
         }
@@ -235,25 +221,6 @@ async function handleCategoryChange(cat) {
 function executeRefresh() { localStorage.removeItem(CACHE_KEY); location.reload(); }
 function closeModal() { document.getElementById('profile-modal').style.display = 'none'; document.body.classList.remove('modal-open'); }
 
-function startSnowfall() {
-    const container = document.getElementById('bg-animation-container');
-    if (!container) return; // Biztonsági ellenőrzés
-    
-    setInterval(() => {
-        const flake = document.createElement('div');
-        flake.classList.add('snowflake');
-        flake.style.left = Math.random() * 100 + 'vw';
-        flake.style.opacity = Math.random() * 0.5 + 0.3;
-        const size = Math.random() * 5 + 3 + 'px';
-        flake.style.width = size;
-        flake.style.height = size;
-        flake.style.animationDuration = Math.random() * 5 + 3 + 's';
-        container.appendChild(flake);
-        setTimeout(() => { flake.remove(); }, 8000); 
-    }, 150);
-}
-
-// Eseménykezelők
 document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', function(e) {
     e.preventDefault();
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -269,8 +236,6 @@ document.getElementById('player-search').addEventListener('input', (e) => {
     if(GLOBAL_PLAYER_DATA) renderPlayers(GLOBAL_PLAYER_DATA, currentCategoryType, e.target.value);
 });
 
-// Indítás
 window.onload = () => {
     handleCategoryChange('stars');
-    startSnowfall();
 };
