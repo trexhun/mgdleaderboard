@@ -11,7 +11,7 @@ const RAW_PLAYERS = ["trexhun", "Leviax", "BlasterLizard", "Krisz", "Andras9912"
     "Serpentical", "Shyze", "ShiveringStars0", "pPaarketta", "Morzsika", "Libakoptato", "Kisgrofo", "kacsloz", "GDWaterGMD", "BVviktor", "Bandi006", 
     "BaloghRicsi", "Balint1117", "AtiDaNub", "rolidemuth", "ErkBG", "Dgyerek", "Marci56", "SenetianVnares", "Petry", "Lemuno", "M4rciii", "BinshipGD", 
     "Skillfuldoge", "G3ri", "Karesz2000", "Aroner2006", "Cleeper1125", "reggae929", "zZokni", "skibidizeti69", "DrFert", "koloska80", "csabadash", "Asabii", 
-    "NimrodHun", "therichest", "matek2448", "Furoka", "MoonsterAlex", "matee312", "bennygeometrix", "MIKROKASCIM", "TheBunnyKeyGD", "NoobendPro"];
+    "NimrodHun", "therichest", "matek2448", "Furoka", "MoonsterAlex", "matee312", "bennygeometrix", "MIKROKASCIM", "TheBunnyKeyGD", "NoobendPro", "mrwinner01", "kolencsik", "GeriGames408", "TiraGD"];
 
 const HUNGARIAN_PLAYERS = [...new Set(RAW_PLAYERS)]; 
 const API_BASE = "https://gdbrowser.com/api/profile";
